@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myjava-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      env: production-frontend
+  template:
+    metadata: 
+      name: myfrontend-pod
+      labels:
+        env: production-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: CONTAINER_IMAGE
+        ports:
+        - containerPort: 8080
+        env:
+        - name: RDS_HOSTNAME                                     # from the key name in the ConfigMap.
+          valueFrom:
+            secretKeyRef:
+              name: database-screte           # The ConfigMap this value comes fro.
+              key: RDS_HOSTNAME  # The key to fetch.
+
+        - name: RDS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: database-config          
+              key: RDS_PORT
+
+        - name: RDS_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: database-screte           
+              key: RDS_DB_NAME
+
+        - name: RDS_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: database-screte
+              key: RDS_USERNAME
+
+        - name: RDS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: database-screte           
+              key: RDS_PASSWORD
